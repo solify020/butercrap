@@ -1,0 +1,100 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isOwner() {
+      return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'owner';
+    }
+    
+    function isStaff() {
+      return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'staff';
+    }
+    
+    function isCurrentUser(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+    
+    // Users collection
+    match /users/{userId} {
+      // Users can read their own document
+      // Owners can read and write all user documents
+      // Staff can read all user documents
+      //allow read: if isCurrentUser(userId) || isOwner() || isStaff();
+      //allow write: if isOwner();
+      
+      // Allow a new user to create their own document
+      //allow create: if isSignedIn() && request.auth.uid == userId;
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Sign-in logs
+    match /signInLogs/{logId} {
+      // Only owners can read sign-in logs
+      allow read: if isOwner();
+      // No client-side writes allowed
+      allow write: if false;
+    }
+    
+    // Links collection
+    match /links/{linkId} {
+      // Owners can read and write all links
+      // Staff can read all links
+      allow read: if isOwner() || isStaff();
+      allow write: if isOwner();
+    }
+    
+    // Tasks collection
+    match /tasks/{taskId} {
+      // Owners can read and write all tasks
+      // Staff can read all tasks and update their assigned tasks
+      allow read: if isOwner() || isStaff();
+      allow create, delete: if isOwner();
+      allow update: if isOwner() || (isStaff() && resource.data.assignedTo == request.auth.uid);
+    }
+    
+    // Content calendar
+    match /calendar/{eventId} {
+      // Owners can read and write all events
+      // Staff can read all events
+      allow read: if isOwner() || isStaff();
+      allow write: if isOwner();
+    }
+    
+    // Followers collection
+    match /followers/{followerId} {
+      // Only owners can access follower data
+      allow read, write: if isOwner();
+    }
+    
+    // Settings collection
+    match /settings/{settingId} {
+      // Only owners can access settings
+      allow read, write: if isOwner();
+      // Allow reading maintenance mode setting for all authenticated users
+      allow read: if isSignedIn() && settingId == 'maintenance';
+    }
+    
+    // Admin logs
+    match /adminLogs/{logId} {
+      // Only owners can read admin logs
+      allow read: if isOwner();
+      // No client-side writes allowed
+      allow write: if false;
+    }
+
+    // Allow read access to all authenticated users for public data
+    match /publicData/{document=**} {
+      allow read: if request.auth != null;
+    }
+    
+    // Deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+

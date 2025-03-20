@@ -1,0 +1,97 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner() {
+      return isAuthenticated() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'owner';
+    }
+    
+    function isStaff() {
+      return isAuthenticated() && 
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'staff' ||
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'owner');
+    }
+    
+    function isUser(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Users collection
+    match /users/{userId} {
+      // Users can read their own data
+      // Owners can read all user data
+      // Staff can read all user data
+      allow read: if isUser(userId) || isOwner() || isStaff();
+      
+      // Users can update their own non-role data
+      // Owners can update any user data
+      allow update: if (isUser(userId) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'disabled'])) || 
+                     isOwner();
+      
+      // Only owners can create or delete users
+      allow create, delete: if isOwner();
+    }
+    
+    // Sign-in logs
+    match /signInLogs/{logId} {
+      // Only the user or owners can read their sign-in logs
+      allow read: if isAuthenticated() && 
+                   (request.auth.uid == resource.data.uid || isOwner());
+      
+      // Users can create their own sign-in logs
+      allow create: if isAuthenticated() && 
+                     request.resource.data.uid == request.auth.uid;
+      
+      // Only owners can delete logs
+      allow delete: if isOwner();
+    }
+    
+    // Role logs
+    match /roleLogs/{logId} {
+      // Only owners can read role logs
+      allow read: if isOwner();
+      
+      // Only owners can create role logs
+      allow create: if isOwner();
+      
+      // No one can update or delete role logs
+      allow update, delete: if false;
+    }
+    
+    // Links collection
+    match /links/{linkId} {
+      // Authenticated users can read links
+      allow read: if isAuthenticated();
+      
+      // Only owners can create, update, or delete links
+      allow create, update, delete: if isOwner();
+    }
+    
+    // Content collection
+    match /content/{contentId} {
+      // Authenticated users can read content
+      allow read: if isAuthenticated();
+      
+      // Owners and staff can create, update content
+      allow create, update: if isStaff();
+      
+      // Only owners can delete content
+      allow delete: if isOwner();
+    }
+    
+    // Settings collection
+    match /settings/{settingId} {
+      // Authenticated users can read settings
+      allow read: if isAuthenticated();
+      
+      // Only owners can update settings
+      allow create, update, delete: if isOwner();
+    }
+  }
+}
+

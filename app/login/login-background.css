@@ -1,0 +1,23 @@
+.diagonal-text-background {
+  position: relative;
+  overflow: hidden;
+}
+
+.diagonal-text-line {
+  position: absolute;
+  white-space: nowrap;
+  transform: rotate(-45deg);
+  transform-origin: left top;
+  color: #a0a0a0;
+  font-size: 2rem;
+  font-weight: bold;
+  opacity: 0.35;
+  left: -5%;
+  width: 200%;
+}
+
+.diagonal-text-line span {
+  display: inline-block;
+  margin: 0 2rem;
+}
+

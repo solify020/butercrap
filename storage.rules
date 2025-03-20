@@ -1,0 +1,47 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Common function to check if the user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Function to check if the user is an owner
+    function isOwner() {
+      return isAuthenticated() && 
+        (request.auth.token.role == 'owner' || request.auth.token.email == 'buterascphq@gmail.com');
+    }
+    
+    // Function to check if the user is staff
+    function isStaff() {
+      return isAuthenticated() && 
+        (request.auth.token.role == 'staff' || request.auth.token.email == 'buterascpstaff@gmail.com');
+    }
+    
+    // Function to validate image file
+    function isValidImage() {
+      return request.resource.contentType.matches('image/.*') &&
+        request.resource.size < 5 * 1024 * 1024; // 5MB max
+    }
+    
+    // Staff images - accessible by staff and owners
+    match /images/staff/{fileName} {
+      allow read: if true; // Public read access for images
+      allow create: if isAuthenticated() && (isStaff() || isOwner()) && isValidImage();
+      allow update, delete: if isAuthenticated() && (isStaff() || isOwner());
+    }
+    
+    // Owner images - accessible only by owners for writing, public for reading
+    match /images/owner/{fileName} {
+      allow read: if true; // Public read access for images
+      allow create: if isAuthenticated() && isOwner() && isValidImage();
+      allow update, delete: if isAuthenticated() && isOwner();
+    }
+    
+    // Default rule - deny all other access
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
+

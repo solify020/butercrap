@@ -1,0 +1,106 @@
+import { db } from "@/lib/firebase"
+import { collection, getDocs, doc, setDoc } from "firebase/firestore"
+
+// Function to ensure collections exist with at least one document
+export async function initializeCollections() {
+  try {
+    if (!db) {
+      console.error("Firestore not initialized")
+      return false
+    }
+
+    // Check if owner-links collection exists
+    try {
+      const ownerLinksRef = collection(db, "owner-links")
+      const ownerLinksSnapshot = await getDocs(ownerLinksRef)
+
+      // If empty, add a sample link
+      if (ownerLinksSnapshot.empty) {
+        try {
+          await setDoc(doc(db, "owner-links", "sample"), {
+            name: "BUTERASCP Website",
+            url: "https://buterascp.com",
+            type: "site",
+            createdAt: new Date(),
+          })
+        } catch (permissionError) {
+          console.warn("Permission denied when adding sample to owner-links. This is normal if you're not an owner.")
+          // Don't throw error, just continue
+        }
+      }
+    } catch (error: any) {
+      // Handle permission errors gracefully
+      if (error.code === "permission-denied") {
+        console.warn("Permission denied when accessing owner-links. This is normal if you're not an owner.")
+      } else {
+        console.error("Error initializing owner-links collection:", error)
+      }
+    }
+
+    // Check if staff-links collection exists
+    try {
+      const staffLinksRef = collection(db, "staff-links")
+      const staffLinksSnapshot = await getDocs(staffLinksRef)
+
+      // If empty, add a sample link
+      if (staffLinksSnapshot.empty) {
+        try {
+          await setDoc(doc(db, "staff-links", "sample"), {
+            name: "Staff Portal",
+            url: "https://staff.buterascp.com",
+            type: "site",
+            createdAt: new Date(),
+          })
+        } catch (permissionError) {
+          console.warn(
+            "Permission denied when adding sample to staff-links. This is normal if you're not a staff member.",
+          )
+          // Don't throw error, just continue
+        }
+      }
+    } catch (error: any) {
+      // Handle permission errors gracefully
+      if (error.code === "permission-denied") {
+        console.warn("Permission denied when accessing staff-links. This is normal if you're not a staff member.")
+      } else {
+        console.error("Error initializing staff-links collection:", error)
+      }
+    }
+
+    // Check if admin settings document exists
+    try {
+      const adminSettingsRef = doc(db, "admin", "settings")
+      try {
+        await setDoc(
+          adminSettingsRef,
+          {
+            maintenanceMode: false,
+            notificationsEnabled: true,
+            sessionTimeoutMinutes: 60,
+            requireTwoFactor: false,
+            allowedDomains: "buterascp.com",
+            updatedAt: new Date(),
+          },
+          { merge: true },
+        )
+      } catch (permissionError) {
+        console.warn("Permission denied when updating admin settings. This is normal if you're not an owner.")
+        // Don't throw error, just continue
+      }
+    } catch (error: any) {
+      // Handle permission errors gracefully
+      if (error.code === "permission-denied") {
+        console.warn("Permission denied when accessing admin settings. This is normal if you're not an owner.")
+      } else {
+        console.error("Error initializing admin settings:", error)
+      }
+    }
+
+    console.log("Collections initialization completed")
+    return true
+  } catch (error) {
+    console.error("Error initializing collections:", error)
+    return false
+  }
+}
+

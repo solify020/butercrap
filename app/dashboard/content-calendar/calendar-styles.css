@@ -1,0 +1,172 @@
+/* Platform-specific colors */
+.rbc-event.twitter {
+  background-color: #1da1f2 !important;
+  border-color: #1da1f2 !important;
+}
+
+.rbc-event.instagram {
+  background-color: #e1306c !important;
+  border-color: #e1306c !important;
+}
+
+.rbc-event.facebook {
+  background-color: #4267b2 !important;
+  border-color: #4267b2 !important;
+}
+
+.rbc-event.youtube {
+  background-color: #ff0000 !important;
+  border-color: #ff0000 !important;
+}
+
+.rbc-event.tiktok {
+  background-color: #000000 !important;
+  border-color: #000000 !important;
+}
+
+.rbc-event.other {
+  background-color: #3182ce !important;
+  border-color: #3182ce !important;
+}
+
+/* Fix calendar styling to match theme */
+.rbc-toolbar button {
+  color: var(--foreground);
+  border-color: var(--border);
+}
+
+.rbc-toolbar button:hover {
+  background-color: var(--accent);
+  color: var(--accent-foreground);
+}
+
+.rbc-toolbar button.rbc-active {
+  background-color: var(--accent);
+  color: var(--accent-foreground);
+}
+
+.rbc-header,
+.rbc-day-bg,
+.rbc-month-row {
+  border-color: var(--border);
+}
+
+.rbc-off-range-bg {
+  background-color: var(--muted);
+}
+
+.rbc-today {
+  background-color: var(--accent-foreground / 10);
+}
+
+/* Calendar custom styles */
+.rbc-calendar {
+  background-color: #333333;
+  border-radius: 0.5rem;
+  color: white;
+}
+
+.rbc-toolbar {
+  padding: 0.5rem;
+  color: white;
+}
+
+.rbc-toolbar button {
+  background-color: #444444;
+  border-color: #666666;
+  color: white;
+}
+
+.rbc-toolbar button:hover {
+  background-color: #555555;
+}
+
+.rbc-toolbar button.rbc-active {
+  background-color: #666666;
+  color: white;
+}
+
+.rbc-header {
+  background-color: #444444;
+  color: #cccccc;
+  padding: 0.5rem;
+  font-weight: normal;
+}
+
+.rbc-day-bg {
+  background-color: #333333;
+  border-color: #444444;
+}
+
+.rbc-off-range-bg {
+  background-color: #2a2a2a;
+}
+
+.rbc-today {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.rbc-event {
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  background-color: #3b82f6;
+  border: none;
+  color: white;
+}
+
+/* Platform-specific colors */
+.twitter {
+  background-color: #1da1f2 !important;
+}
+
+.instagram {
+  background-color: #e1306c !important;
+}
+
+.facebook {
+  background-color: #4267b2 !important;
+}
+
+.youtube {
+  background-color: #ff0000 !important;
+}
+
+.tiktok {
+  background-color: #000000 !important;
+}
+
+.other {
+  background-color: #6b7280 !important;
+}
+
+.rbc-time-view,
+.rbc-month-view {
+  background-color: #333333;
+  border-color: #444444;
+}
+
+.rbc-time-header-content,
+.rbc-time-header {
+  border-color: #444444;
+}
+
+.rbc-timeslot-group {
+  border-color: #444444;
+}
+
+.rbc-time-content {
+  border-color: #444444;
+}
+
+.rbc-day-slot .rbc-time-slot {
+  border-color: #3a3a3a;
+}
+
+.rbc-time-view .rbc-header {
+  border-color: #444444;
+}
+
+.rbc-current-time-indicator {
+  background-color: #3b82f6;
+}
+

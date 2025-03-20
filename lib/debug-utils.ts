@@ -1,0 +1,120 @@
+/**
+ * Debug utilities for logging and error handling
+ */
+
+// Log levels
+export type LogLevel = "debug" | "info" | "warn" | "error"
+
+// Logger configuration
+const config = {
+  enabled: process.env.NODE_ENV !== "test",
+  minLevel: (process.env.LOG_LEVEL || "info") as LogLevel,
+  levels: {
+    debug: 0,
+    info: 1,
+    warn: 2,
+    error: 3,
+  },
+}
+
+// Determine if a log level should be displayed based on minimum level setting
+const shouldLog = (level: LogLevel): boolean => {
+  if (!config.enabled) return false
+  return config.levels[level] >= config.levels[config.minLevel]
+}
+
+// Safe stringification of objects for logging
+const safeStringify = (obj: any): string => {
+  try {
+    return JSON.stringify(
+      obj,
+      (key, value) => {
+        // Handle circular references and functions
+        if (typeof value === "function") return "[Function]"
+        if (typeof value === "object" && value !== null) {
+          if (key === "password" || key === "token" || key.includes("secret")) {
+            return "[REDACTED]"
+          }
+        }
+        return value
+      },
+      2,
+    )
+  } catch (err) {
+    return `[Object cannot be stringified: ${err}]`
+  }
+}
+
+// Format log message with timestamp and level
+const formatMessage = (level: LogLevel, message: string, meta?: any): string => {
+  const timestamp = new Date().toISOString()
+  let formattedMessage = `[${timestamp}] [${level.toUpperCase()}] ${message}`
+
+  if (meta) {
+    formattedMessage += ` ${safeStringify(meta)}`
+  }
+
+  return formattedMessage
+}
+
+// Logger methods
+export const logger = {
+  debug: (message: string, meta?: any) => {
+    if (shouldLog("debug")) {
+      console.debug(formatMessage("debug", message, meta))
+    }
+  },
+
+  info: (message: string, meta?: any) => {
+    if (shouldLog("info")) {
+      console.info(formatMessage("info", message, meta))
+    }
+  },
+
+  warn: (message: string, meta?: any) => {
+    if (shouldLog("warn")) {
+      console.warn(formatMessage("warn", message, meta))
+    }
+  },
+
+  error: (message: string, meta?: any) => {
+    if (shouldLog("error")) {
+      console.error(formatMessage("error", message, meta))
+    }
+  },
+}
+
+/**
+ * Logs a detailed error with context information
+ */
+export function logDetailedError(error: any, context?: string, additionalInfo?: any) {
+  const errorMessage = error instanceof Error ? error.message : String(error)
+  const errorStack = error instanceof Error ? error.stack : undefined
+
+  logger.error(`Error${context ? ` in ${context}` : ""}: ${errorMessage}`, {
+    stack: errorStack,
+    ...additionalInfo,
+  })
+}
+
+/**
+ * Logs a debug message with optional data
+ */
+export function logDebug(message: string, data?: any) {
+  logger.debug(message, data)
+}
+
+/**
+ * Logs an informational message with optional data
+ */
+export function logInfo(message: string, data?: any) {
+  logger.info(message, data)
+}
+
+export default {
+  logger,
+  logDetailedError,
+  logDebug,
+  logInfo,
+}
+

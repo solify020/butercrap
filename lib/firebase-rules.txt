@@ -1,0 +1,134 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner() {
+      return isAuthenticated() && 
+        (request.auth.token.role == 'owner' || request.auth.token.adminBypass == true);
+    }
+    
+    function isStaff() {
+      return isAuthenticated() && 
+        (request.auth.token.role == 'staff' || request.auth.token.role == 'owner' || 
+         request.auth.token.adminBypass == true);
+    }
+    
+    function isApproved() {
+      return isAuthenticated() && 
+        (request.auth.token.approved == true || request.auth.token.adminBypass == true);
+    }
+    
+    function isUser(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isNewUser() {
+      return isAuthenticated() && 
+        !exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+        !exists(/databases/$(database)/documents/pendingUsers/$(request.auth.uid));
+    }
+    
+    // System settings - only owners can modify, anyone authenticated can read
+    match /settings/{document} {
+      allow read: if isAuthenticated();
+      allow write: if isOwner();
+    }
+    
+    // Users collection - owners can manage all users
+    match /users/{userId} {
+      // Users can read their own data
+      // Owners and staff can read all user data
+      allow read: if isUser(userId) || isStaff();
+      
+      // Owners can write to any user document
+      // Users can update their own non-critical fields
+      allow create: if isOwner() || isNewUser();
+      allow update: if isOwner() || 
+        (isUser(userId) && 
+         !request.resource.data.diff(resource.data).affectedKeys()
+          .hasAny(['role', 'approved', 'adminBypass', 'disabled']));
+      allow delete: if isOwner();
+    }
+    
+    // Pending users collection - for approval workflow
+    match /pendingUsers/{userId} {
+      // Users can read their own pending status
+      // Owners can read all pending users
+      allow read: if isUser(userId) || isOwner();
+      
+      // New users can create their own pending document
+      // Owners can manage pending users
+      allow create: if isOwner() || isNewUser() || isUser(userId);
+      allow update: if isOwner() || 
+        (isUser(userId) && 
+         !request.resource.data.diff(resource.data).affectedKeys()
+          .hasAny(['role', 'approved']));
+      allow delete: if isOwner();
+    }
+    
+    // Sign-in logs - for security tracking
+    match /signInLogs/{logId} {
+      // Only the user can read their own logs
+      // Owners can read all logs
+      allow read: if isOwner() || 
+        (isAuthenticated() && resource.data.uid == request.auth.uid);
+      
+      // Users can create their own logs
+      // System can create logs for any user
+      allow create: if isAuthenticated() && 
+        (request.resource.data.uid == request.auth.uid || isOwner());
+      
+      // Only owners can delete logs
+      allow delete: if isOwner();
+      
+      // No updates to logs
+      allow update: if false;
+    }
+    
+    // Content collection - for app content
+    match /content/{contentId} {
+      // Approved users can read content
+      // Only staff and owners can write content
+      allow read: if isApproved();
+      allow write: if isStaff();
+    }
+    
+    // Calendar events
+    match /events/{eventId} {
+      allow read: if isApproved();
+      allow write: if isStaff();
+    }
+    
+    // Followers collection
+    match /followers/{followerId} {
+      allow read: if isApproved();
+      allow write: if isStaff();
+    }
+    
+    // Tasks collection
+    match /tasks/{taskId} {
+      allow read: if isApproved();
+      allow create, update: if isAuthenticated();
+      allow delete: if isStaff() || 
+        (isAuthenticated() && resource.data.createdBy == request.auth.uid);
+    }
+    
+    // Links collection
+    match /links/{linkId} {
+      allow read: if isApproved();
+      allow write: if isStaff();
+    }
+    
+    // Wildcard rule for any other collections
+    match /{document=**} {
+      // By default, deny access to any other collections
+      // Only owners have full access
+      allow read, write: if isOwner();
+    }
+  }
+}
+

@@ -1,0 +1,208 @@
+"use client"
+
+import type React from "react"
+
+import { useState, useEffect } from "react"
+import { signInWithEmailAndPassword } from "firebase/auth"
+import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Label } from "@/components/ui/label"
+import { AlertCircle, Lock, Loader2 } from "lucide-react"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { auth, db } from "@/lib/firebase"
+import { collection, addDoc } from "firebase/firestore"
+import Cookies from "js-cookie"
+import { initializeCollections } from "@/lib/init-collections"
+
+export default function LoginForm() {
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const [firebaseInitialized, setFirebaseInitialized] = useState(true)
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!auth) {
+      setFirebaseInitialized(false)
+      setError("Firebase authentication is not initialized. Please check your environment variables.")
+    }
+  }, [])
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!firebaseInitialized) {
+      setError("Authentication service is not available. Please check your configuration.")
+      return
+    }
+
+    setIsLoading(true)
+    setError("")
+
+    try {
+      // Sign in with Firebase Authentication
+      const userCredential = await signInWithEmailAndPassword(auth, email, password)
+      const user = userCredential.user
+
+      // Initialize collections if needed - don't wait for this to complete
+      // and don't let errors here block the login process
+      try {
+        await initializeCollections()
+      } catch (initError) {
+        console.error("Failed to initialize collections:", initError)
+        // Don't block login if this fails
+      }
+
+      // Log sign-in attempt to Firestore for audit trail
+      try {
+        if (db) {
+          const signInLogRef = collection(db, "sign-in-logs")
+          await addDoc(signInLogRef, {
+            userId: user.uid,
+            email: user.email,
+            timestamp: new Date(),
+            success: true,
+            ipAddress: "client-side", // This will be replaced by the server
+            userAgent: navigator.userAgent,
+          })
+        }
+      } catch (logError) {
+        console.error("Failed to log sign-in attempt:", logError)
+        // Don't block login if this fails
+      }
+
+      // Set client-side cookies directly instead of using the API
+      // This is a fallback approach that will work even if the API fails
+      const role = email === "buterascphq@gmail.com" ? "owner" : "staff"
+
+      Cookies.set("auth", "true", {
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        expires: 7, // 7 days
+        path: "/",
+      })
+
+      Cookies.set("user-role", role, {
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        expires: 7, // 7 days
+        path: "/",
+      })
+
+      // Redirect based on role
+      if (role === "owner") {
+        router.push("/owner-dashboard")
+      } else {
+        router.push("/staff-dashboard")
+      }
+    } catch (error: any) {
+      console.error("Sign in error:", error)
+
+      // Log failed sign-in attempt
+      try {
+        if (db) {
+          const signInLogRef = collection(db, "sign-in-logs")
+          await addDoc(signInLogRef, {
+            email: email,
+            timestamp: new Date(),
+            success: false,
+            errorCode: error.code,
+            ipAddress: "client-side", // This will be replaced by the server
+            userAgent: navigator.userAgent,
+          })
+        }
+      } catch (logError) {
+        console.error("Failed to log sign-in attempt:", logError)
+      }
+
+      if (
+        error.code === "auth/invalid-credential" ||
+        error.code === "auth/user-not-found" ||
+        error.code === "auth/wrong-password"
+      ) {
+        setError("Invalid email or password")
+      } else if (error.code === "auth/invalid-email") {
+        setError("Invalid email format")
+      } else {
+        setError(`Authentication error: ${error.message || "Unknown error"}`)
+      }
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  return (
+    <Card className="w-[400px] bg-[#4a4a4a] border-[#6a6a6a] shadow-xl">
+      <CardHeader className="space-y-4 pb-6">
+        <div className="flex justify-center mb-2">
+          <div className="w-16 h-16 rounded-full bg-[#3a3a3a] flex items-center justify-center">
+            <Lock className="h-8 w-8 text-white" />
+          </div>
+        </div>
+        <CardTitle className="text-center text-white text-2xl font-bold tracking-tight">BUTERASCP STAFF</CardTitle>
+        <CardDescription className="text-center text-gray-300">Sign in to access the staff portal</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit}>
+          <div className="grid w-full items-center gap-5">
+            {error && (
+              <Alert variant="destructive" className="bg-[#5a5a5a] border-red-500">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+            <div className="flex flex-col space-y-2">
+              <Label htmlFor="email" className="text-gray-200 font-medium">
+                Email
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="bg-[#3a3a3a] border-[#6a6a6a] text-white focus:border-white focus:ring-1 focus:ring-white transition-all duration-300"
+                disabled={isLoading || !firebaseInitialized}
+                placeholder="your.email@example.com"
+              />
+            </div>
+            <div className="flex flex-col space-y-2">
+              <Label htmlFor="password" className="text-gray-200 font-medium">
+                Password
+              </Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="bg-[#3a3a3a] border-[#6a6a6a] text-white focus:border-white focus:ring-1 focus:ring-white transition-all duration-300"
+                disabled={isLoading || !firebaseInitialized}
+              />
+            </div>
+          </div>
+        </form>
+      </CardContent>
+      <CardFooter className="pt-2 pb-6">
+        <Button
+          onClick={handleSubmit}
+          disabled={isLoading || !firebaseInitialized}
+          className="w-full bg-[#3a3a3a] hover:bg-[#2a2a2a] text-white font-medium py-5 text-base shadow-md transition-all duration-300 hover:shadow-lg"
+        >
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Signing in...
+            </>
+          ) : (
+            "Sign In"
+          )}
+        </Button>
+      </CardFooter>
+    </Card>
+  )
+}
+

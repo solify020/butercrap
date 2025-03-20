@@ -1,0 +1,620 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Custom button styles with exact gray colors */
+.btn-primary {
+  background-color: #999999;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #646464;
+}
+
+.btn-secondary {
+  background-color: #646464;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #4d4d4d;
+}
+
+/* Custom text colors */
+.text-gray-primary {
+  color: #999999;
+}
+
+.text-gray-secondary {
+  color: #646464;
+}
+
+/* Custom background colors */
+.bg-gray-primary {
+  background-color: #999999;
+}
+
+.bg-gray-secondary {
+  background-color: #646464;
+}
+
+/* Custom border colors */
+.border-gray-primary {
+  border-color: #999999;
+}
+
+.border-gray-secondary {
+  border-color: #646464;
+}
+
+/* Custom utilities for backdrop blur */
+.backdrop-blur-xs {
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+.backdrop-blur-sm {
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.backdrop-blur-md {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.backdrop-blur-lg {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.backdrop-blur-xl {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.backdrop-blur-2xl {
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+.backdrop-blur-3xl {
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
+}
+
+/* Animation utilities */
+.animate-in {
+  animation-duration: 0.3s;
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+}
+
+.fade-in-50 {
+  animation-name: fadeIn;
+}
+
+/* iOS-style zoom animation */
+.zoom-in {
+  animation: zoomIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Animations */
+.fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.slide-up {
+  animation: slideUp 0.5s ease-out forwards;
+  opacity: 0;
+}
+
+.ios-zoom-in {
+  animation: ios-zoom-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.dashboard-container-animation {
+  opacity: 0;
+  animation: fade-in 0.5s ease forwards;
+}
+
+.dashboard-item-appear {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fade-slide-up 0.5s ease forwards;
+}
+
+.fade-slide-in {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fade-slide-up 0.5s ease forwards;
+}
+
+.subtle-bounce {
+  animation: subtle-bounce 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.button-zoom-effect {
+  transition: transform 0.2s;
+}
+
+.button-zoom-effect:hover {
+  transform: scale(1.05);
+}
+
+/* Fluid animations */
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 3s ease-in-out infinite;
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 3s ease-in-out infinite;
+}
+
+.animate-text-shimmer {
+  background: linear-gradient(to right, #646464 0%, #999999 20%, #646464 40%, #646464 100%);
+  background-size: 200% auto;
+  color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textShimmer 4s linear infinite;
+}
+
+.animate-button-pulse {
+  animation: buttonPulse 2s infinite;
+}
+
+.animate-input-focus {
+  transition: all 0.3s ease;
+}
+
+.animate-input-focus:focus {
+  transform: scale(1.01);
+  box-shadow: 0 0 0 2px rgba(153, 153, 153, 0.2);
+}
+
+.animate-subtle-float {
+  animation: subtle-float 10s ease-in-out infinite;
+}
+
+.animate-subtle-brightness {
+  animation: subtle-brightness 8s ease-in-out infinite;
+}
+
+/* Add this new animation for the lock icon */
+.animate-subtle-pulse {
+  animation: subtlePulse 3s ease-in-out infinite;
+}
+
+/* Add this keyframe definition for the lock jiggle effect */
+@keyframes lockJiggle {
+  0% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-5deg);
+  }
+  50% {
+    transform: rotate(5deg);
+  }
+  75% {
+    transform: rotate(-5deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+.animate-lock-jiggle {
+  animation: lockJiggle 0.5s ease-in-out;
+}
+
+/* Add these new animations for the security verification effect */
+@keyframes scanLine {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes scanEffect {
+  0% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.5);
+  }
+  100% {
+    filter: brightness(1);
+  }
+}
+
+@keyframes verifiedPulse {
+  0% {
+    filter: drop-shadow(0 0 0 rgba(255, 255, 255, 0));
+  }
+  50% {
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.7));
+  }
+  100% {
+    filter: drop-shadow(0 0 0 rgba(255, 255, 255, 0));
+  }
+}
+
+@keyframes ringPulse {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(0.8);
+    opacity: 0.7;
+  }
+}
+
+/* Add this animation for the floating key */
+@keyframes keyFloat {
+  0% {
+    transform: translateX(12px) translateY(-12px) rotate(45deg);
+  }
+  25% {
+    transform: translateX(14px) translateY(-10px) rotate(50deg);
+  }
+  50% {
+    transform: translateX(12px) translateY(-8px) rotate(45deg);
+  }
+  75% {
+    transform: translateX(10px) translateY(-10px) rotate(40deg);
+  }
+  100% {
+    transform: translateX(12px) translateY(-12px) rotate(45deg);
+  }
+}
+
+.animate-key-float {
+  animation: keyFloat 2s ease-in-out infinite;
+}
+
+.animate-scan-line {
+  animation: scanLine 1.5s ease-in-out infinite;
+}
+
+.animate-scan-effect {
+  animation: scanEffect 1.5s ease-in-out infinite;
+}
+
+.animate-verified-pulse {
+  animation: verifiedPulse 2s ease-in-out infinite;
+}
+
+.animate-ring-pulse {
+  animation: ringPulse 3s ease-in-out infinite;
+}
+
+/* Keyframes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes zoomIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes ios-zoom-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes subtle-bounce {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 0 0 5px rgba(153, 153, 153, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 10px rgba(153, 153, 153, 0.5);
+  }
+  100% {
+    box-shadow: 0 0 5px rgba(153, 153, 153, 0.3);
+  }
+}
+
+@keyframes pulseSubtle {
+  0% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes textShimmer {
+  0% {
+    background-position: 0% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes buttonPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(153, 153, 153, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(153, 153, 153, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(153, 153, 153, 0);
+  }
+}
+
+@keyframes subtleFloat {
+  0% {
+    transform: translate(0px, 0px);
+  }
+  25% {
+    transform: translate(5px, 5px);
+  }
+  50% {
+    transform: translate(0px, 10px);
+  }
+  75% {
+    transform: translate(-5px, 5px);
+  }
+  100% {
+    transform: translate(0px, 0px);
+  }
+}
+
+@keyframes subtleBrightness {
+  0% {
+    backdrop-filter: blur(5px) brightness(1);
+  }
+  50% {
+    backdrop-filter: blur(5px) brightness(1.1);
+  }
+  100% {
+    backdrop-filter: blur(5px) brightness(1);
+  }
+}
+
+/* Add this keyframe definition */
+@keyframes subtlePulse {
+  0% {
+    opacity: 0.9;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.9;
+  }
+}
+
+/* Custom animations for the login page */
+@keyframes subtle-float {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes subtle-brightness {
+  0% {
+    opacity: 0.15;
+  }
+  50% {
+    opacity: 0.2;
+  }
+  100% {
+    opacity: 0.15;
+  }
+}
+
+@keyframes pulse-subtle {
+  0% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes verified-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-subtle-float {
+  animation: subtle-float 10s ease-in-out infinite;
+}
+
+.animate-subtle-brightness {
+  animation: subtle-brightness 8s ease-in-out infinite;
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 3s ease-in-out infinite;
+}
+
+.animate-verified-pulse {
+  animation: verified-pulse 1s ease-in-out infinite;
+}
+
