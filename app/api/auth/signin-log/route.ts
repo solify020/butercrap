@@ -4,7 +4,7 @@ import { getFirestore } from "firebase-admin/firestore"
 import { initAdmin } from "@/lib/firebase-admin"
 
 // Import the authOptions using dynamic import
-const { authOptions } = require("../[...nextauth]/options")
+const { authOptions } = require("../nextauth/options")
 
 export async function GET(request: NextRequest) {
   try {
